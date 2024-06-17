@@ -1,0 +1,348 @@
+{
+	"info": {
+		"_postman_id": "826d26d9-a2e0-47f3-996a-4d2462c6b59e",
+		"name": "Supervillain Exercise",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Generate Token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b75afea2-d381-4141-9ea2-b8d79f9f0239",
+						"exec": [
+							"pm.test(\"Token is returned\", function () {\r",
+							"    \r",
+							"    let jsonData = pm.response.json();\r",
+							"    if(pm.response.code == 200){\r",
+							"        let token = jsonData.token;\r",
+							"        let email = jsonData.emailTo;\r",
+							"        pm.globals.set('authToken', token);\r",
+							"        pm.globals.set('emailA', email);\r",
+							"    }\r",
+							"    else{\r",
+							"        pm.execution.setNextRequest(null);\r",
+							"    }\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "6e4eab52-3a01-498f-9b2e-30967292b3bb",
+						"exec": [
+							"pm.globals.set('randomNumber', Math.floor(Math.random() * 99999));"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"id": "7f2b489d-4889-4ddd-a9c1-190dfacfe591",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true,
+				"disabledSystemHeaders": {
+					"user-agent": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"key\": \"Brendan_Test{{randomNumber}}\",\r\n    \"email\": \"bruceofbeer+{{randomNumber}}@gmail.com\",\r\n    \"returnKey\": true\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "https://supervillan-81ce46d107ff.herokuapp.com/auth/gentoken"
+			},
+			"response": []
+		},
+		{
+			"name": "Verify Token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "684d9227-78ad-4dc1-8fae-29894769cb30",
+						"exec": [
+							"pm.test(\"Token is verified\", function () {\r",
+							"\r",
+							"    let jsonData = pm.response.json();\r",
+							"    if(pm.response.code == 200){\r",
+							"        let appId = jsonData[0].app_id;\r",
+							"        let user = jsonData[0].app;\r",
+							"        pm.globals.set('appID', appId);\r",
+							"        pm.globals.set('userName', user);\r",
+							"    }\r",
+							"    else{\r",
+							"        pm.execution.setNextRequest(null);\r",
+							"    }\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"id": "e9d81763-870e-484d-b19b-a29767d626db",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true,
+				"disabledSystemHeaders": {
+					"user-agent": true
+				}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{authToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "https://supervillan-81ce46d107ff.herokuapp.com/auth/verifytoken"
+			},
+			"response": []
+		},
+		{
+			"name": "Register user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "deb6497f-b8dc-4f8e-9fa5-df82bca2f2d3",
+						"exec": [
+							"pm.test(\"User is registered\", function () {\r",
+							"\r",
+							"    if(pm.response.code != 200){\r",
+							"        pm.execution.setNextRequest(null);\r",
+							"    }\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"id": "f9c59917-be0b-4bec-9f0f-6fd8730bee34",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true,
+				"disabledSystemHeaders": {
+					"user-agent": true,
+					"accept-encoding": true,
+					"connection": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{authToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"bruce{{randomNumber}}\",\r\n    \"password\": \"Test/Pass01\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "https://supervillan-81ce46d107ff.herokuapp.com/auth/user/register"
+			},
+			"response": []
+		},
+		{
+			"name": "Login user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d5b8a879-e7d6-4d0b-954c-c9c2f19c389c",
+						"exec": [
+							"pm.test(\"User is logged in\", function () {\r",
+							"\r",
+							"    let jsonData = pm.response.json();\r",
+							"    if(pm.response.code == 200){\r",
+							"        let loginToken = jsonData.token;\r",
+							"        pm.globals.set('loginToken', loginToken);\r",
+							"    }\r",
+							"    else{\r",
+							"        pm.execution.setNextRequest(null);\r",
+							"    }\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"id": "12f44961-40d3-41a7-b6cd-fb10d82ab1b8",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true,
+				"disabledSystemHeaders": {
+					"accept-encoding": true,
+					"connection": true,
+					"user-agent": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{authToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"bruce{{randomNumber}}\",\r\n    \"password\": \"Test/Pass01\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "https://supervillan-81ce46d107ff.herokuapp.com/auth/user/login"
+			},
+			"response": []
+		},
+		{
+			"name": "Add new user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3dacc244-dfb3-4b76-a606-6fda754398fe",
+						"exec": [
+							"pm.test(\"User added to scoreboard\", function () {\r",
+							"\r",
+							"    let jsonData = pm.response.json();\r",
+							"    if(pm.response.code != 201){\r",
+							"        pm.execution.setNextRequest(null);\r",
+							"    }\r",
+							"    pm.response.to.have.status(201);\r",
+							"    pm.expect(jsonData.status).to.equal(\"success\");\r",
+							"    pm.expect(jsonData.message).to.equal(\"User added.\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"id": "c8b47463-5763-48ed-aff6-962270969450",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true,
+				"disabledSystemHeaders": {
+					"user-agent": true,
+					"connection": true,
+					"accept-encoding": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{loginToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"username\": \"bruce{{randomNumber}}\",\r\n  \"score\": 0\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "https://supervillan-81ce46d107ff.herokuapp.com/v1/user"
+			},
+			"response": []
+		},
+		{
+			"name": "update Points",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "667a9d36-b492-46a4-9962-d0ef35ac44b9",
+						"exec": [
+							"pm.test(\"User points are updated\", function () {\r",
+							"\r",
+							"    if(pm.response.code == 204){\r",
+							"        pm.execution.setNextRequest(null);\r",
+							"    }\r",
+							"    pm.response.to.have.status(204);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"id": "c023a5a4-5841-4165-a7cd-5bbdbc8be9cf",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true,
+				"disabledSystemHeaders": {
+					"connection": true,
+					"accept-encoding": true,
+					"user-agent": true
+				}
+			},
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{loginToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"username\": \"bruce{{randomNumber}}\",\r\n  \"score\": 60\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "https://supervillan-81ce46d107ff.herokuapp.com/v1/user"
+			},
+			"response": []
+		}
+	]
+}
